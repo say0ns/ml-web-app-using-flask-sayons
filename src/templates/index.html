@@ -2,316 +2,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diabetes Predictor - Random Forest</title>
-    
-    <!-- Bootstrap 5.3.2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <title>Diabetes Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <style>
-        * {
-            font-family: 'Inter', sans-serif;
+        body {
+            background-color: #f8f9fa;
         }
-        
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 80px 0;
+        .form-container {
+            max-width: 500px;
+            margin: 60px auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
-        
-        .prediction-form {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .result-card {
-            display: none;
-            margin-top: 30px;
-        }
-        
-        .form-label {
-            font-weight: 500;
-            color: #495057;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 12px 30px;
-            font-weight: 500;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-            transform: translateY(-1px);
-            transition: all 0.3s ease;
-        }
-        
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-        
-        .spinner-border-sm {
-            width: 1rem;
-            height: 1rem;
+        .icon {
+            font-size: 1.5rem;
+            margin-right: 8px;
         }
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container text-center">
-            <h1 class="display-4 fw-bold mb-4">Diabetes Predictor</h1>
-            <p class="lead mb-0">Random Forest Machine Learning Model</p>
-        </div>
-    </section>
 
-    <!-- Predictor Section -->
-    <section class="py-5">
-        <div class="container">
-            <div class="prediction-form">
-                <h2 class="text-center mb-4 fw-semibold">Enter Medical Data</h2>
-                
-                <form id="predictionForm">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="pregnancies" class="form-label">Pregnancies</label>
-                            <input type="number" class="form-control" id="pregnancies" min="0" max="20" required>
-                            <div class="form-text">Number of times pregnant</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="glucose" class="form-label">Glucose</label>
-                            <input type="number" class="form-control" id="glucose" min="0" max="300" required>
-                            <div class="form-text">Plasma glucose concentration (mg/dL)</div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="bloodPressure" class="form-label">Blood Pressure</label>
-                            <input type="number" class="form-control" id="bloodPressure" min="0" max="200" required>
-                            <div class="form-text">Diastolic blood pressure (mm Hg)</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="skinThickness" class="form-label">Skin Thickness</label>
-                            <input type="number" class="form-control" id="skinThickness" min="0" max="100" required>
-                            <div class="form-text">Triceps skin fold thickness (mm)</div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="insulin" class="form-label">Insulin</label>
-                            <input type="number" class="form-control" id="insulin" min="0" max="900" required>
-                            <div class="form-text">2-Hour serum insulin (mu U/ml)</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="bmi" class="form-label">BMI</label>
-                            <input type="number" class="form-control" id="bmi" min="0" max="70" step="0.1" required>
-                            <div class="form-text">Body mass index (weight in kg/(height in m)^2)</div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="diabetesPedigree" class="form-label">Diabetes Pedigree Function</label>
-                            <input type="number" class="form-control" id="diabetesPedigree" min="0" max="3" step="0.001" required>
-                            <div class="form-text">Diabetes pedigree function (0.0 - 2.5)</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="age" class="form-label">Age</label>
-                            <input type="number" class="form-control" id="age" min="1" max="120" required>
-                            <div class="form-text">Age in years</div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg" id="predictBtn">
-                            <i class="bi bi-cpu me-2"></i>
-                            <span class="btn-text">Predict Diabetes</span>
-                            <span class="btn-loading d-none">
-                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                Processing...
-                            </span>
-                        </button>
-                    </div>
-                </form>
-                
-                <!-- Result Card -->
-                <div id="resultCard" class="result-card">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <h5 class="card-title fw-semibold">Prediction Result</h5>
-                            <div id="predictionResult"></div>
-                        </div>
-                    </div>
-                </div>
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Diabetes Classifier</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="val1" class="form-label">Pregnancies</label>
+                <input type="number" class="form-control" name="val1" id="val1" step="any" required>
             </div>
-        </div>
-    </section>
+            <div class="mb-3">
+                <label for="val2" class="form-label">Glucose</label>
+                <input type="number" class="form-control" name="val2" id="val2" step="any" required>
+            </div>
+            <div class="mb-3">
+                <label for="val3" class="form-label">Blood Pressure</label>
+                <input type="number" class="form-control" name="val3" id="val3" step="any" required>
+            </div>
+            <div class="mb-3">
+                <label for="val4" class="form-label">Skin Thickness</label>
+                <input type="number" class="form-control" name="val4" id="val4" step="any" required>
+            </div>
+            <div class="mb-3">
+                <label for="val5" class="form-label">Insulin</label>
+                <input type="number" class="form-control" name="val5" id="val5" step="any" required>
+            </div>
+            <div class="mb-3">
+                <label for="val6" class="form-label">BMI</label>
+                <input type="number" class="form-control" name="val6" id="val6" step="any" required>
+            </div>
+            <div class="mb-3">
+                <label for="val7" class="form-label">Diabetes Pedigree Function</label>
+                <input type="number" class="form-control" name="val7" id="val7" step="any" required>
+            </div>
+            <div class="mb-3">
+                <label for="val8" class="form-label">Age</label>
+                <input type="number" class="form-control" name="val8" id="val8" step="any" required>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Predict</button>
+            </div>
+        </form>
 
-    <!-- Bootstrap 5.3.2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    
-    <script>
-        // Configuración de la API
-        const API_BASE_URL = window.location.origin; // Usa la misma URL base que el frontend
-        
-        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Mostrar estado de carga
-            const form = document.getElementById('predictionForm');
-            const btn = document.getElementById('predictBtn');
-            const btnText = btn.querySelector('.btn-text');
-            const btnLoading = btn.querySelector('.btn-loading');
-            
-            form.classList.add('loading');
-            btnText.classList.add('d-none');
-            btnLoading.classList.remove('d-none');
-            
-            // Simular delay de procesamiento
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            try {
-                // Recopilar datos del formulario
-                const formData = {
-                    pregnancies: parseInt(document.getElementById('pregnancies').value),
-                    glucose: parseInt(document.getElementById('glucose').value),
-                    blood_pressure: parseInt(document.getElementById('bloodPressure').value),
-                    skin_thickness: parseInt(document.getElementById('skinThickness').value),
-                    insulin: parseInt(document.getElementById('insulin').value),
-                    bmi: parseFloat(document.getElementById('bmi').value),
-                    diabetes_pedigree: parseFloat(document.getElementById('diabetesPedigree').value),
-                    age: parseInt(document.getElementById('age').value)
-                };
-                
-                // Realizar petición a la API
-                const response = await fetch(`${API_BASE_URL}/predict`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                
-                // Mostrar resultado
-                displayResult(result.prediction, result.confidence, result.probability);
-                
-            } catch (error) {
-                console.error('Error en la predicción:', error);
-                displayError();
-            } finally {
-                // Restaurar estado del botón
-                form.classList.remove('loading');
-                btnText.classList.remove('d-none');
-                btnLoading.classList.add('d-none');
-            }
-        });
-        
-        function displayResult(prediction, confidence, probability) {
-            const resultDiv = document.getElementById('predictionResult');
-            const resultCard = document.getElementById('resultCard');
-            
-            const riskPercentage = (probability * 100).toFixed(1);
-            const confidencePercentage = (confidence * 100).toFixed(1);
-            
-            // prediction puede ser 1 (tiene diabetes) o 0 (no tiene diabetes)
-            const hasDiabetes = prediction === 1 || prediction === true;
-            
-            if (hasDiabetes) {
-                resultDiv.innerHTML = `
-                    <div class="alert alert-warning border-0">
-                        <i class="bi bi-exclamation-triangle-fill fs-2 mb-3 text-warning"></i>
-                        <h4 class="fw-semibold text-warning">High Risk</h4>
-                        <p class="mb-2">The model predicts a high risk of diabetes.</p>
-                        <div class="row text-center mt-3">
-                            <div class="col-6">
-                                <strong>Risk Score</strong><br>
-                                <span class="fs-4 text-warning">${riskPercentage}%</span>
-                            </div>
-                            <div class="col-6">
-                                <strong>Confidence</strong><br>
-                                <span class="fs-4 text-muted">${confidencePercentage}%</span>
-                            </div>
-                        </div>
-                        <small class="text-muted d-block mt-3">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Please consult with a healthcare professional for proper diagnosis.
-                        </small>
-                    </div>
-                `;
-            } else {
-                resultDiv.innerHTML = `
-                    <div class="alert alert-success border-0">
-                        <i class="bi bi-check-circle-fill fs-2 mb-3 text-success"></i>
-                        <h4 class="fw-semibold text-success">Low Risk</h4>
-                        <p class="mb-2">The model predicts a low risk of diabetes.</p>
-                        <div class="row text-center mt-3">
-                            <div class="col-6">
-                                <strong>Risk Score</strong><br>
-                                <span class="fs-4 text-success">${riskPercentage}%</span>
-                            </div>
-                            <div class="col-6">
-                                <strong>Confidence</strong><br>
-                                <span class="fs-4 text-muted">${confidencePercentage}%</span>
-                            </div>
-                        </div>
-                        <small class="text-muted d-block mt-3">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Continue maintaining a healthy lifestyle and regular check-ups.
-                        </small>
-                    </div>
-                `;
-            }
-            
-            resultCard.style.display = 'block';
-            resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        
-        function displayError() {
-            const resultDiv = document.getElementById('predictionResult');
-            const resultCard = document.getElementById('resultCard');
-            
-            resultDiv.innerHTML = `
-                <div class="alert alert-danger border-0">
-                    <i class="bi bi-x-circle-fill fs-2 mb-3 text-danger"></i>
-                    <h4 class="fw-semibold text-danger">Error</h4>
-                    <p class="mb-0">An error occurred while processing the request. Please try again.</p>
-                </div>
-            `;
-            
-            resultCard.style.display = 'block';
-        }
-        
-        // Llenar datos de ejemplo al hacer click en el título
-        document.querySelector('.hero-section h1').addEventListener('dblclick', function() {
-            document.getElementById('pregnancies').value = 2;
-            document.getElementById('glucose').value = 148;
-            document.getElementById('bloodPressure').value = 72;
-            document.getElementById('skinThickness').value = 35;
-            document.getElementById('insulin').value = 0;
-            document.getElementById('bmi').value = 33.6;
-            document.getElementById('diabetesPedigree').value = 0.627;
-            document.getElementById('age').value = 50;
-        });
-    </script>
+        {% if prediction %}
+        <div class="alert text-center mt-4 
+            {% if prediction == 'Diabetes' %}
+                alert-danger
+            {% else %}
+                alert-success
+            {% endif %}" role="alert">
+            <span class="icon">
+                {% if prediction == 'Diabetes' %}
+                    ⚠️
+                {% else %}
+                    ✅
+                {% endif %}
+            </span>
+            <strong>Prediction:</strong> {{ prediction }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
 </body>
 </html>
